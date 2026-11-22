@@ -5,270 +5,241 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gold Value Check</title>
 <meta name="description" content="See how much of a gold piece's price is actually gold, at the live gold price.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f0e0c" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Gold Value Check">
+<meta property="og:description" content="How much of the price is actually gold? Check any piece at the live gold price.">
+<meta property="og:url" content="https://youssefjewls.github.io/gold-value/">
+<meta property="og:image" content="https://youssefjewls.github.io/gold-value/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23c9a227'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /*
-VOICE: plain, honest, jeweller's bench scale — numbers first, no hype.
-IDEA: an assay slip — today's gold price against the price the piece needs gold to reach.
-PICTURE: the big "gold has to rise ×" figure, today→break-even track and price split, beside the inputs.
-COLOUR and TYPE: white ground, bullion gold field, crimson for the gap; Sora + Inter.
-LAYOUT: live strip, title, piece tabs + inputs left / result right, compare table, what-if, reference + method.
+VOICE: quiet and exact — one question, one answer, nothing extra.
+IDEA: a jeweller's receipt slip: inputs above, the verdict printed large below.
+PICTURE: the big rise multiple with a single today→break-even line.
+COLOUR and TYPE: white, near-black ink, one gold accent; Inter only, tabular figures.
+LAYOUT: one centred 600px column; extras folded into disclosures.
 */
 :root{color-scheme:light dark;
---bg:light-dark(#ffffff,#14110b);--ink:light-dark(#1d1810,#f3ecdd);--mute:light-dark(#6b6253,#b3a88f);
---line:light-dark(#e8e1d2,#3a3326);--panel:light-dark(#faf7f0,#1d1910);
---gold:light-dark(#b8891a,#d9ab3c);--goldfield:light-dark(#f3e3b5,#3b2f12);--goldink:light-dark(#5a420a,#f6e2a8);
---red:light-dark(#b3261e,#ff7a70);--redsoft:light-dark(#f6dedb,#3a1f1c);--ok:light-dark(#2f6b3a,#86d49a)}
-:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+--bg:light-dark(#ffffff,#0f0e0c);--ink:light-dark(#111111,#f2f0eb);--mute:light-dark(#77736b,#9a958b);
+--line:light-dark(#ecebe7,#25231f);--soft:light-dark(#f7f6f3,#191815);
+--gold:light-dark(#b48a1c,#d6ad45);--goldsoft:light-dark(#f6efdc,#2a2414)}
 *{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
-.band{padding:clamp(20px,3.5vw,44px) max(5vw,16px)}
-.wrap{max-width:1180px;margin:0 auto}
-h1{font:700 clamp(28px,4vw,42px)/1.05 Sora,Inter,sans-serif;margin:0 0 8px;text-wrap:balance}
-h2{font:700 22px/1.2 Sora,Inter,sans-serif;margin:0 0 12px}
-.lede{color:var(--mute);margin:0;max-width:64ch}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"tnum","cv11"}
 a{color:inherit}
-.live{background:var(--goldfield);color:var(--goldink);padding-block:16px}
-.live .wrap{display:flex;flex-wrap:wrap;gap:10px 28px;align-items:center;justify-content:space-between}
-.spot{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
-.spot b{font:700 clamp(24px,3.4vw,34px)/1 Sora,sans-serif;white-space:nowrap}
-.store{font:700 15px Sora,sans-serif;margin-right:8px}
-.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--mute);margin-right:6px;vertical-align:1px}
-.dot.on{background:var(--ok);animation:p 2s infinite}
-@keyframes p{50%{opacity:.35}}
-.status{font-size:14px}
-.grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(20px,3vw,44px);align-items:start}
-@media(max-width:780px){.grid{grid-template-columns:minmax(0,1fr)}}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-.tabs button{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tabs .add{border-style:dashed;color:var(--mute)}
-form{display:grid;gap:16px}
-label{display:block;font-weight:600;font-size:15px;margin-bottom:6px}
-.hint{font-weight:400;color:var(--mute);font-size:13px}
-.row{display:flex;gap:8px}
-input,select{font:16px Inter,sans-serif;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;min-height:46px;width:100%}
-input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-.row select{width:auto;flex:none}
-.karats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
-.karats button{padding:4px 2px;line-height:1.15}
-.karats small{display:block;font-weight:500;font-size:12px;opacity:.75}
-button{font:600 15px Inter,sans-serif;min-height:44px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;padding:0 14px}
-button:hover{border-color:var(--gold)}
-button[aria-pressed=true],button[aria-selected=true]{background:var(--gold);border-color:var(--gold);color:#fff}
-.linkbtn{border:0;background:none;color:var(--mute);text-decoration:underline;padding:0 4px;min-height:44px;font-weight:500;font-size:14px}
-.result{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:clamp(18px,2.6vw,32px)}
-.big{font:700 clamp(56px,9vw,92px)/1 Sora,sans-serif;color:var(--red);margin:4px 0 6px}
-.big.fair{color:var(--ok)}
-.verdict{font-size:18px;font-weight:500;margin:0 0 20px;text-wrap:balance}
-.race{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:end;margin-bottom:12px}
-.rcol span{display:block;font-size:13px;color:var(--mute)}
-.rcol strong{font:700 clamp(20px,2.6vw,28px)/1.2 Sora,sans-serif;white-space:nowrap}
-.need{color:var(--red)}
-.arrow{font:700 24px Sora,sans-serif;color:var(--mute);padding-bottom:2px}
-.track{height:14px;border-radius:7px;background:var(--redsoft);overflow:hidden}
-.track div{height:100%;border-radius:7px;background:var(--gold);transition:width .4s}
-.sub{font:700 16px/1.3 Sora,sans-serif;margin:24px 0 10px}
-.bar{display:flex;height:52px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
-.bar div{display:flex;align-items:center;padding:0 12px;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;transition:width .4s}
-.b1{background:var(--gold);color:#fff}.b2{background:light-dark(#efe9dc,#2c261b);color:var(--mute)}
-.legend{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:var(--mute);margin:8px 0 0;flex-wrap:wrap}
-.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:20px}
-.figs div{background:var(--bg);padding:14px 16px}
-.figs span{display:block;font-size:13px;color:var(--mute)}
-.figs strong{font:700 21px/1.25 Sora,sans-serif;white-space:nowrap}
-.figs .wide{grid-column:1/-1}
-@media(max-width:420px){.figs{grid-template-columns:minmax(0,1fr)}.race{grid-template-columns:minmax(0,1fr)}.arrow{display:none}}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center}
-.small{font-size:13px;color:var(--mute)}
-.whatif{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,3vw,44px);align-items:center}
-@media(max-width:780px){.whatif{grid-template-columns:minmax(0,1fr)}}
-input[type=range]{padding:0;border:0;min-height:44px;accent-color:var(--gold);background:none}
-.wiBig{font:700 clamp(30px,4.6vw,46px)/1.05 Sora,sans-serif;margin:0 0 6px}
-.ticks{display:flex;justify-content:space-between;font-size:13px;color:var(--mute)}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.col{max-width:600px;margin:0 auto;padding:0 20px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 0}
+.brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px}
+.mark{width:14px;height:14px;border-radius:50%;background:var(--gold)}
+.pill{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--mute);white-space:nowrap}
+.pill b{color:var(--ink);font-weight:600}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--mute)}
+.dot.on{background:#2fa35a;box-shadow:0 0 0 3px light-dark(#2fa35a22,#2fa35a33)}
+h1{font-size:clamp(30px,7vw,40px);line-height:1.08;letter-spacing:-.025em;font-weight:700;margin:28px 0 10px;text-wrap:balance}
+.lede{color:var(--mute);margin:0 0 28px;font-size:17px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.tabs button{min-height:36px;padding:0 14px;border-radius:99px;font-size:14px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabs [aria-selected=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.field{margin-bottom:18px}
+label,.lab{display:block;font-size:13px;font-weight:500;color:var(--mute);margin-bottom:6px}
+.box{display:flex;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--bg);transition:border-color .15s}
+.box:focus-within{border-color:var(--ink)}
+.box span{padding-left:14px;color:var(--mute)}
+input,select{font:inherit;font-size:17px;color:var(--ink);background:transparent;border:0;outline:0;padding:13px 14px;width:100%;min-height:50px}
+.box select{width:auto;flex:none;font-size:15px;color:var(--mute);padding-right:12px;border-left:1px solid var(--line);border-radius:0}
+.seg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg button{border:0;border-radius:9px;min-height:44px;padding:0;font-size:15px;line-height:1.1}
+.seg small{display:block;font-size:11px;font-weight:400;color:var(--mute)}
+.seg [aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.seg [aria-pressed=true] small{color:inherit;opacity:.65}
+.taxrow{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:14px;font-size:15px}
+.taxrow select{width:auto;font-size:15px;min-height:40px;padding:6px 8px;text-align:right;color:var(--ink)}
+button{font:inherit;font-weight:500;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;min-height:44px;padding:0 16px;cursor:pointer}
+button:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.ghost{border:0;background:none;color:var(--mute);padding:0 4px;min-height:36px;font-size:14px}
+.ghost:hover{color:var(--ink)}
+.res{margin:36px 0 8px;padding-top:32px;border-top:1px solid var(--line)}
+.k{font-size:13px;font-weight:500;color:var(--mute);margin:0}
+.big{font-size:clamp(72px,20vw,112px);font-weight:700;letter-spacing:-.05em;line-height:1;margin:6px 0 12px}
+.say{font-size:18px;line-height:1.45;margin:0 0 26px;text-wrap:pretty}
+.say b{font-weight:600}
+.line{position:relative;height:6px;border-radius:3px;background:var(--line)}
+.line div{position:absolute;inset:0 auto 0 0;border-radius:3px;background:var(--gold);transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.ends{display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:14px}
+.ends span{display:block;font-size:12px;color:var(--mute)}
+.ends b{font-weight:600;white-space:nowrap}
+.ends .r{text-align:right}.ends .r b{color:var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:30px 0 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stats div{padding:16px 0}
+.stats div+div{padding-left:16px;border-left:1px solid var(--line)}
+.stats span{display:block;font-size:12px;color:var(--mute);margin-bottom:2px}
+.stats b{font-size:17px;font-weight:600;white-space:nowrap}
+@media(max-width:440px){.stats{grid-template-columns:minmax(0,1fr)}.stats div+div{padding-left:0;border-left:0;border-top:1px solid var(--line)}.stats div{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0}}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:20px}
+.primary{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.note{font-size:13px;color:var(--mute)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{padding:10px 0;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th+th,td+td{padding-left:12px}
 th:first-child,td:first-child{text-align:left}
-th{font-size:13px;color:var(--mute);font-weight:600}
-.cmp th{color:var(--ink);font-size:15px}
-.best{color:var(--ok);font-weight:600}
-.badge{display:inline-block;font-size:12px;font-weight:600;color:var(--ok);border:1px solid currentColor;border-radius:99px;padding:0 8px;margin-left:6px}
-.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(20px,3vw,44px)}
-@media(max-width:780px){.two{grid-template-columns:minmax(0,1fr)}}
-.method p{margin:0 0 10px}
-pre,.scroll{overflow-x:auto}code{overflow-wrap:anywhere}
-footer{border-top:1px solid var(--line)}
-.embed .hero,.embed footer .more{display:none}
+th{font-size:12px;font-weight:500;color:var(--mute)}
+.cmp{margin-top:40px}
+.cmp h2,summary{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.cmp h2{margin:0 0 8px}
+.cmp td:first-child{color:var(--mute);white-space:normal}
+.cmp th{color:var(--ink);font-size:14px;font-weight:600;white-space:normal;vertical-align:bottom}
+.best{color:var(--gold);font-weight:600}
+.scroll{overflow-x:auto}
+details{border-bottom:1px solid var(--line)}
+details:first-of-type{margin-top:40px;border-top:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;padding:18px 0;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-weight:400;font-size:22px;color:var(--mute);line-height:1}
+details[open] summary::after{content:"–"}
+.inner{padding:0 0 22px}
+.inner p{margin:0 0 10px;font-size:15px}
+input[type=range]{padding:0;min-height:40px;accent-color:var(--gold)}
+.wi{font-size:34px;font-weight:700;letter-spacing:-.03em;margin:4px 0 2px}
+.ticks{display:flex;justify-content:space-between;font-size:12px;color:var(--mute)}
+footer{padding:28px 0 44px;font-size:12px;color:var(--mute)}
+footer p{margin:0 0 4px}
 [hidden]{display:none!important}
-@media(max-width:600px){table{font-size:13px}th,td{padding:8px 6px}.cmp th{font-size:13px;white-space:normal;vertical-align:bottom}.badge{display:block;width:max-content;margin:4px 0 0 auto}.cmp td:first-child{white-space:normal}}
-@media(prefers-reduced-motion:reduce){.dot.on{animation:none}.track div,.bar div{transition:none}}
+.embed h1,.embed .lede{display:none}
+@media(prefers-reduced-motion:reduce){.line div,.box{transition:none}}
 </style>
 </head>
 <body>
+<div class="col">
+  <header>
+    <div class="brand"><span class="mark" aria-hidden="true"></span><span id="brand">Gold Value Check</span></div>
+    <div class="pill" aria-live="polite"><span class="dot" id="dot"></span><span>Gold <b id="spotOz">—</b></span></div>
+  </header>
 
-<section class="band live" aria-live="polite">
-  <div class="wrap">
-    <div class="spot">
-      <span><span class="store" id="store" hidden></span><span class="dot" id="dot"></span><span id="srcLabel">Gold price</span></span>
-      <b id="spotOz">—</b>
-      <span id="spotG" class="status"></span>
+  <h1>How much of the price is gold?</h1>
+  <p class="lede">Check any gold piece against the live gold price.</p>
+
+  <div class="tabs" role="tablist" aria-label="Pieces" id="tabs" hidden></div>
+
+  <form id="f" novalidate>
+    <div class="field" id="nameField" hidden>
+      <label for="name">Name</label>
+      <div class="box"><input id="name" autocomplete="off" maxlength="40" placeholder="e.g. Store chain"></div>
     </div>
-    <div class="row" style="align-items:center;flex-wrap:wrap">
-      <span class="status" id="status">Loading live price…</span>
-      <a class="status" href="https://goldprice.org/spot-gold.html" target="_blank" rel="noopener">Check on goldprice.org ↗</a>
-      <select id="cur" aria-label="Currency"><option value="CAD">CAD</option><option value="USD">USD</option></select>
+    <div class="field">
+      <label for="price">Price</label>
+      <div class="box"><span id="sym">C$</span><input id="price" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
     </div>
-  </div>
-</section>
-
-<section class="band hero">
-  <div class="wrap">
-    <h1>How much of the price is actually gold?</h1>
-    <p class="lede">Enter a piece's price, weight and karat. You'll see the value of the gold inside it at today's live price, and how high gold would have to go for that gold to be worth what you paid. Add more pieces to compare them.</p>
-  </div>
-</section>
-
-<section class="band" style="padding-top:0">
-  <div class="wrap grid">
-    <div>
-      <div class="tabs" role="tablist" aria-label="Pieces" id="tabs"></div>
-      <form id="f" novalidate>
-        <div>
-          <label for="name">Name <span class="hint">(optional, e.g. "Store chain")</span></label>
-          <input id="name" autocomplete="off" maxlength="40">
-        </div>
-        <div>
-          <label for="price">Price <span class="hint">(as listed, before tax)</span></label>
-          <input id="price" inputmode="decimal" autocomplete="off">
-        </div>
-        <div>
-          <label for="wt">Weight <span class="hint">(ask the seller if it isn't listed)</span></label>
-          <div class="row">
-            <input id="wt" inputmode="decimal" autocomplete="off">
-            <select id="unit" aria-label="Weight unit"><option value="g">grams</option><option value="dwt">dwt</option><option value="ozt">troy oz</option></select>
-          </div>
-        </div>
-        <div>
-          <label id="kLab">Karat <span class="hint">(and the stamp to look for)</span></label>
-          <div class="karats" role="group" aria-labelledby="kLab" id="karats"></div>
-        </div>
-        <div>
-          <label for="tax">Sales tax</label>
-          <select id="tax">
-            <option value="0">No tax</option>
-            <option value="5">GST 5% (AB, territories)</option>
-            <option value="13">HST 13% (Ontario)</option>
-            <option value="14.975">GST + QST 14.975% (Quebec)</option>
-            <option value="15">HST 15% (Atlantic provinces)</option>
-          </select>
-        </div>
-        <div>
-          <label for="spotIn">Gold price per troy ounce <span class="hint">(pure gold — filled in live, or type your own)</span></label>
-          <div class="row">
-            <input id="spotIn" inputmode="decimal" autocomplete="off">
-            <button type="button" id="useLive">Use live</button>
-          </div>
-        </div>
-        <div class="row" style="flex-wrap:wrap;align-items:center">
-          <button type="button" id="remove" class="linkbtn">Remove this piece</button>
-          <button type="button" id="reset" class="linkbtn">Start over</button>
-        </div>
-      </form>
-    </div>
-
-    <div class="result" aria-live="polite">
-      <div class="small" id="rHead">To break even, gold has to go up</div>
-      <div class="big" id="mult">—</div>
-      <p class="verdict" id="verdict"></p>
-      <div class="race">
-        <div class="rcol"><span>Gold today</span><strong id="rToday">—</strong></div>
-        <div class="arrow" aria-hidden="true">→</div>
-        <div class="rcol"><span>Gold needed to break even</span><strong id="rNeed" class="need">—</strong></div>
-      </div>
-      <div class="track" aria-hidden="true"><div id="tFill"></div></div>
-      <div class="legend"><span>Today</span><span>Break-even</span></div>
-
-      <h3 class="sub">Where the money goes</h3>
-      <div class="bar" role="img" id="bar" aria-label=""><div class="b1" id="b1"></div><div class="b2" id="b2"></div></div>
-      <div class="legend"><span><span style="color:var(--gold)">■</span> Gold inside, at today's price</span><span>Design, labour, store costs, profit and tax</span></div>
-
-      <div class="figs">
-        <div><span>You pay, with tax</span><strong id="paid">—</strong></div>
-        <div><span>Gold value of this piece</span><strong id="melt">—</strong></div>
-        <div><span>You pay per gram</span><strong id="ppg">—</strong></div>
-        <div><span>Gold value per gram</span><strong id="gpg">—</strong></div>
-        <div class="wide"><span>A gold buyer would likely pay you today (70–90% of gold value)</span><strong id="scrap">—</strong></div>
-      </div>
-      <div class="actions">
-        <button type="button" id="copy">Copy result</button>
-        <button type="button" id="share" hidden>Copy share link</button>
-        <span class="small" id="copied" role="status"></span>
+    <div class="field">
+      <label for="wt">Weight</label>
+      <div class="box">
+        <input id="wt" inputmode="decimal" autocomplete="off" placeholder="0.00">
+        <select id="unit" aria-label="Weight unit"><option value="g">grams</option><option value="dwt">dwt</option><option value="ozt">troy oz</option></select>
       </div>
     </div>
-  </div>
-</section>
+    <div class="field">
+      <span class="lab" id="kLab">Karat</span>
+      <div class="seg" role="group" aria-labelledby="kLab" id="karats"></div>
+    </div>
+    <div class="taxrow">
+      <label for="tax" style="margin:0;font-size:15px;color:var(--ink);font-weight:400">Sales tax</label>
+      <select id="tax">
+        <option value="0">None</option>
+        <option value="5">GST 5%</option>
+        <option value="13">HST 13% · ON</option>
+        <option value="14.975">GST + QST 14.975% · QC</option>
+        <option value="15">HST 15% · Atlantic</option>
+      </select>
+    </div>
+  </form>
 
-<section class="band" id="cmpBand" style="padding-top:0" hidden>
-  <div class="wrap">
+  <section class="res" aria-live="polite">
+    <p class="k" id="rHead">Gold has to rise</p>
+    <div class="big" id="mult">—</div>
+    <p class="say" id="say"></p>
+    <div class="line" aria-hidden="true"><div id="fill"></div></div>
+    <div class="ends">
+      <div><span>Gold today</span><b id="eToday">—</b></div>
+      <div class="r"><span>Break-even</span><b id="eNeed">—</b></div>
+    </div>
+    <div class="stats">
+      <div><span>Gold value</span><b id="melt">—</b></div>
+      <div><span>You pay per gram</span><b id="ppg">—</b></div>
+      <div><span>Gold buyer pays</span><b id="scrap">—</b></div>
+    </div>
+    <div class="acts">
+      <button type="button" class="primary" id="share">Share</button>
+      <button type="button" id="add">Compare another</button>
+      <button type="button" class="ghost" id="remove" hidden>Remove</button>
+      <button type="button" class="ghost" id="reset">Clear</button>
+      <span class="note" id="msg" role="status"></span>
+    </div>
+  </section>
+
+  <section class="cmp" id="cmpBand" hidden>
     <h2>Side by side</h2>
-    <div class="scroll"><table class="cmp" id="cmp"></table></div>
-    <p class="small">The piece priced closest to its gold value is marked. A higher price can still be fair for better work, but the gold costs the same everywhere.</p>
-  </div>
-</section>
+    <div class="scroll"><table id="cmp"></table></div>
+  </section>
 
-<section class="band" style="padding-top:0">
-  <div class="wrap result whatif">
-    <div>
-      <h2 style="margin-bottom:6px">What if gold goes to…</h2>
-      <p class="small" style="margin:0 0 10px">Drag to see what the gold in <b id="wiName">this piece</b> would be worth at other gold prices.</p>
-      <input type="range" id="wi" min="0" max="100" step="1" aria-label="Gold price per ounce">
+  <details id="wiBox">
+    <summary>What if gold goes to…</summary>
+    <div class="inner">
+      <input type="range" id="wi" aria-label="Gold price per ounce">
       <div class="ticks"><span id="wiMin"></span><span id="wiMax"></span></div>
+      <p class="note" style="margin:16px 0 0">At <b id="wiAt" style="color:var(--ink)">—</b> an ounce, the gold in it is worth</p>
+      <div class="wi" id="wiVal">—</div>
+      <p class="note" id="wiPct" style="margin:0"></p>
     </div>
-    <div aria-live="polite">
-      <p class="small" style="margin:0">At <b id="wiAt">—</b> an ounce, the gold in it is worth</p>
-      <p class="wiBig" id="wiVal">—</p>
-      <p style="margin:0" id="wiPct"></p>
-    </div>
-  </div>
-</section>
+  </details>
 
-<section class="band" style="padding-top:0">
-  <div class="wrap two">
-    <div>
-      <h2>Gold value per gram right now</h2>
-      <div class="scroll"><table>
-        <thead><tr><th>Karat</th><th>Stamp</th><th>Gold</th><th>Per gram</th><th>Per dwt</th></tr></thead>
-        <tbody id="tbl"></tbody>
-      </table></div>
-      <p class="small">This is the value of the gold alone. Finished jewellery sells for more, and gold buyers usually pay 70–90% of it for scrap.</p>
+  <details>
+    <summary>Gold value per gram today</summary>
+    <div class="inner">
+      <table><thead><tr><th>Karat</th><th>Stamp</th><th>Gold</th><th>Per gram</th></tr></thead><tbody id="tbl"></tbody></table>
+      <p class="note" style="margin-top:12px">Value of the gold alone. Gold buyers usually pay 70–90% of it.</p>
     </div>
-    <div class="method">
-      <h2>How it's calculated</h2>
-      <p><b>Gold value</b> = grams × gold content × (gold price per oz ÷ 31.1035).</p>
-      <p><b>Break-even gold price</b> = price with tax ÷ (grams × gold content) × 31.1035.</p>
-      <p><b>How much gold has to rise</b> = break-even price ÷ today's price. It's the same as price ÷ gold value.</p>
-      <p>Gold content is karat ÷ 24, so 14k is 58.3%. One troy ounce is 31.1035 g, and one pennyweight (dwt) is 1.5552 g.</p>
-      <p class="small">Paying more than the gold value is normal for jewellery, because the price also covers design, the work of making it and the store's costs. Bullion coins and bars usually sell for only a few percent above the gold value.</p>
-    </div>
-  </div>
-</section>
+  </details>
 
-<footer class="band">
-  <div class="wrap small">Live gold prices from <a href="https://gold-api.com">gold-api.com</a>, updated every minute. Compare with the spot price on <a href="https://goldprice.org/spot-gold.html" target="_blank" rel="noopener">goldprice.org</a>. <span class="more">These figures are estimates for comparison only, not an appraisal or financial advice.</span> <span id="storeLink"></span></div>
-</footer>
+  <details>
+    <summary>How it's calculated</summary>
+    <div class="inner">
+      <p><b>Gold value</b> = grams × gold content × gold price per gram.</p>
+      <p><b>Break-even</b> = price with tax ÷ (grams × gold content) × 31.1035.</p>
+      <p><b>Rise</b> = break-even ÷ today's gold price.</p>
+      <p class="note">Gold content is karat ÷ 24 (14k = 58.3%). One troy ounce is 31.1035 g. Paying above gold value is normal for jewellery, since the price also covers design, craft and the store's costs.</p>
+      <label for="spotIn" style="margin-top:16px">Gold price per troy ounce (pure)</label>
+      <div class="box"><input id="spotIn" inputmode="decimal" autocomplete="off"><button type="button" class="ghost" id="useLive" style="margin-right:8px">Use live</button></div>
+      <div style="display:flex;justify-content:space-between;gap:12px;margin-top:10px;flex-wrap:wrap">
+        <select id="cur" aria-label="Currency" style="width:auto;min-height:40px;padding:6px 0;font-size:15px"><option value="CAD">CAD</option><option value="USD">USD</option></select>
+        <a class="note" href="https://goldprice.org/spot-gold.html" target="_blank" rel="noopener" style="align-self:center">Check on goldprice.org ↗</a>
+      </div>
+    </div>
+  </details>
+
+  <footer>
+    <p id="status">Loading live price…</p>
+    <p>Prices from <a href="https://gold-api.com">gold-api.com</a>. Estimates for comparison, not an appraisal or financial advice. <span id="storeLink"></span></p>
+  </footer>
+</div>
 
 <script>
 {
 /* ===== Settings — edit these ===== */
 const CONFIG = {
-  storeName: '',            // e.g. 'Bork Gems' — shown in the price strip
+  storeName: '',            // e.g. 'Bork Gems' — replaces "Gold Value Check" in the header
   storeUrl: '',             // e.g. 'https://example.com' — linked in the footer
   currency: 'CAD',          // 'CAD' or 'USD'
   defaultTax: '13',         // '0', '5', '13', '14.975' or '15'
   scrap: [0.70, 0.90],      // share of gold value a gold buyer typically pays
   fallback: {CAD: 5070, USD: 3545, date: 'Nov 21, 2026'},
-  example: {name: 'Store chain (example)', price: '4599.99', wt: '17.48', unit: 'g', k: 14}
+  example: {name: '', price: '4599.99', wt: '17.48', unit: 'g', k: 14}
 };
 /* ================================== */
 
@@ -279,53 +250,50 @@ const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 const num = s => { const n = parseFloat(String(s ?? '').replace(/[^0-9.]/g,'')); return isFinite(n) ? n : NaN; };
 const store = { get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } }, set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
 
-let pieces, active = 0, live = null, liveOK = false, manual = false, wiPrice = null;
-const newPiece = n => ({name:'', price:'', wt:'', unit:'g', k:14, _n:n});
+let pieces, active = 0, manual = false, wiPrice = null;
+const blank = () => ({name:'', price:'', wt:'', unit:'g', k:14});
 
 const params = new URLSearchParams(location.search);
 if (params.get('embed') === '1') document.body.classList.add('embed');
-let fromLink = null;
-try { fromLink = params.get('c') ? JSON.parse(params.get('c')) : null; } catch(e){}
-const saved = store.get('gvc2');
-pieces = (fromLink && fromLink.pieces) || (saved && saved.pieces) || [{...CONFIG.example}];
-$('tax').value = (fromLink && fromLink.tax) || (saved && saved.tax) || CONFIG.defaultTax;
+let link = null;
+try { link = params.get('c') ? JSON.parse(params.get('c')) : null; } catch(e){}
+const saved = store.get('gvc3');
+pieces = (link && link.pieces) || (saved && saved.pieces) || [{...CONFIG.example}];
+$('tax').value = (link && link.tax) || (saved && saved.tax) || CONFIG.defaultTax;
 $('cur').value = (saved && saved.cur) || CONFIG.currency;
-if (CONFIG.storeName) { $('store').textContent = CONFIG.storeName; $('store').hidden = false; }
+if (CONFIG.storeName) $('brand').textContent = CONFIG.storeName;
 if (CONFIG.storeUrl) $('storeLink').innerHTML = `<a href="${esc(CONFIG.storeUrl)}">${esc(CONFIG.storeName || CONFIG.storeUrl)}</a>`;
-const topLevel = (() => { try { return window.top === window.self && /^https?:/.test(location.protocol); } catch(e){ return false; } })();
-$('share').hidden = !topLevel;
 
 const cur = () => $('cur').value;
-const money = (n, d=2) => isFinite(n) ? (cur()==='CAD'?'C$':'US$') + n.toLocaleString('en-CA',{minimumFractionDigits:d,maximumFractionDigits:d}) : '—';
+const sym = () => cur() === 'CAD' ? 'C$' : 'US$';
+const money = (n, d=0) => isFinite(n) ? sym() + n.toLocaleString('en-CA',{minimumFractionDigits:d,maximumFractionDigits:d}) : '—';
 const spot = () => num($('spotIn').value);
-const taxRate = () => num($('tax').value) / 100 || 0;
-const label = (p, i) => p.name || `Piece ${String.fromCharCode(65 + i)}`;
+const taxRate = () => (num($('tax').value) || 0) / 100;
+const label = (p, i) => p.name || `Piece ${i + 1}`;
 
 function metrics(p){
   const s = spot(), g = num(p.wt) * UNITS[p.unit], pur = KARATS.find(x => x.k === +p.k).p;
-  const listed = num(p.price), paid = listed * (1 + taxRate());
-  const gpg = s / OZ * pur, melt = g * gpg, mult = paid / melt, be = paid / (g * pur) * OZ;
-  return {s, g, pur, listed, paid, gpg, melt, mult, be, ppg: paid / g, ok: isFinite(mult) && g > 0 && paid > 0 && s > 0};
+  const paid = num(p.price) * (1 + taxRate());
+  const melt = g * pur * s / OZ, mult = paid / melt;
+  return {s, g, pur, paid, melt, mult, be: paid / (g * pur) * OZ, ppg: paid / g, ok: isFinite(mult) && g > 0 && paid > 0 && s > 0};
 }
 
 $('karats').innerHTML = KARATS.map(x => `<button type="button" data-k="${x.k}">${x.k}k<small>${x.s}</small></button>`).join('');
 
 function renderTabs(){
-  $('tabs').innerHTML = pieces.map((p,i) => `<button type="button" role="tab" data-i="${i}" aria-selected="${i===active}">${esc(label(p,i))}</button>`).join('')
-    + (pieces.length < 3 ? `<button type="button" class="add" id="add">+ Compare another piece</button>` : '');
-  $('remove').hidden = pieces.length < 2;
+  const many = pieces.length > 1;
+  $('tabs').hidden = !many; $('nameField').hidden = !many; $('remove').hidden = !many;
+  $('add').hidden = pieces.length >= 3;
+  $('tabs').innerHTML = pieces.map((p,i) => `<button type="button" role="tab" data-i="${i}" aria-selected="${i===active}">${esc(label(p,i))}</button>`).join('');
 }
-
 function fillForm(){
   const p = pieces[active];
   $('name').value = p.name; $('price').value = p.price; $('wt').value = p.wt; $('unit').value = p.unit;
   for (const b of $('karats').children) b.setAttribute('aria-pressed', +b.dataset.k === +p.k);
 }
-
 function setSpot(price, text, ok){
   if (!manual) $('spotIn').value = price.toFixed(2);
   $('dot').className = 'dot' + (ok ? ' on' : '');
-  $('srcLabel').textContent = ok ? 'Live gold price' : 'Gold price';
   $('status').textContent = text;
 }
 
@@ -336,102 +304,74 @@ async function load(){
     if (!r.ok) throw new Error(r.status);
     const j = await r.json();
     if (!(j.price > 0)) throw new Error('bad data');
-    live = j.price; liveOK = true;
     const t = j.updatedAt ? new Date(j.updatedAt) : new Date();
-    store.set('gvc-last-' + c, {price: live, at: t.toISOString()});
-    setSpot(live, 'Updated ' + t.toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'}) + ' · refreshes every minute', true);
+    store.set('gvc-last-' + c, {price: j.price, at: t.toISOString()});
+    setSpot(j.price, 'Live gold price · updated ' + t.toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'}) + ' · refreshes every minute', true);
   } catch (e) {
-    liveOK = false;
     const last = store.get('gvc-last-' + c);
-    if (last && last.price > 0) {
-      live = last.price;
-      setSpot(live, 'Live price unavailable — showing the last price seen, ' + new Date(last.at).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) + '.', false);
-    } else {
-      live = CONFIG.fallback[c];
-      setSpot(live, `Live price unavailable here, so this uses the ${CONFIG.fallback.date} price. Type today's price to update it.`, false);
-    }
+    if (last && last.price > 0) setSpot(last.price, 'Live price unavailable. Showing the last price seen, ' + new Date(last.at).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) + '.', false);
+    else setSpot(CONFIG.fallback[c], `Live price unavailable. Showing the ${CONFIG.fallback.date} price.`, false);
   }
   calc();
 }
 
 function calc(){
   const p = pieces[active], m = metrics(p), s = m.s;
-  $('spotOz').textContent = s > 0 ? money(s) + ' / oz' : '—';
-  $('spotG').textContent = s > 0 ? money(s / OZ) + ' per gram, pure' : '';
-  $('tbl').innerHTML = KARATS.map(x => `<tr><td>${x.k}k</td><td>${x.s}</td><td>${(x.p*100).toFixed(1)}%</td><td>${money(s/OZ*x.p)}</td><td>${money(s/OZ*x.p*UNITS.dwt)}</td></tr>`).join('');
+  $('sym').textContent = sym();
+  $('spotOz').textContent = s > 0 ? money(s) + '/oz' : '—';
+  $('tbl').innerHTML = KARATS.map(x => `<tr><td>${x.k}k</td><td>${x.s}</td><td>${(x.p*100).toFixed(1)}%</td><td>${money(s/OZ*x.p, 2)}</td></tr>`).join('');
 
-  const name = label(p, active), t = taxRate();
-  $('rHead').textContent = `To break even on ${name.toLowerCase().startsWith('piece') ? 'this piece' : '“' + name + '”'}, gold has to go up`;
-  $('mult').textContent = m.ok ? (m.mult < 1 ? 'Already there' : m.mult.toFixed(2) + '×') : '—';
-  $('mult').className = 'big' + (m.ok && m.mult < 1.3 ? ' fair' : '');
-  $('verdict').textContent = !m.ok ? 'Enter a price and weight to see the breakdown.'
-    : m.mult < 1 ? 'The price is below the value of the gold inside. Double-check the weight and karat.'
-    : `Gold is ${money(s,0)} an ounce today. For the gold in this piece to be worth the ${money(m.paid,0)} you'd pay${t ? ' with tax' : ''}, gold has to reach ${money(m.be,0)} an ounce, ${Math.round((m.mult-1)*100)}% higher than today.`;
-  $('rToday').textContent = s > 0 ? money(s,0) + ' / oz' : '—';
-  $('rNeed').textContent = m.ok ? money(m.be,0) + ' / oz' : '—';
-  const share = m.ok ? Math.min(100, 100 / m.mult) : 0;
-  $('tFill').style.width = share + '%';
-  $('b1').style.width = share + '%'; $('b2').style.width = (100 - share) + '%';
-  $('b1').textContent = share >= 18 ? Math.round(share) + '% gold' : '';
-  $('b2').textContent = m.ok && share < 82 ? Math.round(100 - share) + '% other' : '';
-  $('bar').setAttribute('aria-label', m.ok ? `${Math.round(share)} percent of the price is gold value` : 'No result yet');
-  $('paid').textContent = m.ok ? money(m.paid) : '—';
+  const t = taxRate(), named = pieces.length > 1 ? `“${label(p, active)}”` : 'this piece';
+  $('rHead').textContent = m.ok && m.mult < 1 ? 'Priced below its gold value' : 'Gold has to rise';
+  $('mult').textContent = !m.ok ? '—' : m.mult < 1 ? Math.round(m.mult * 100) + '%' : m.mult.toFixed(2) + '×';
+  $('say').innerHTML = !m.ok ? 'Enter a price and weight.'
+    : m.mult < 1 ? `The ${money(m.paid)} price is less than the ${money(m.melt)} of gold inside. Double-check the weight and karat.`
+    : `from <b>${money(s)}</b> to <b>${money(m.be)}</b> an ounce before the gold in ${named} is worth the <b>${money(m.paid)}</b> you'd pay${t ? ' with tax' : ''}.`;
+  $('fill').style.width = (m.ok ? Math.min(100, 100 / m.mult) : 0) + '%';
+  $('eToday').textContent = s > 0 ? money(s) : '—';
+  $('eNeed').textContent = m.ok ? money(m.be) : '—';
   $('melt').textContent = m.ok ? money(m.melt) : '—';
-  $('ppg').textContent = m.ok ? money(m.ppg) : '—';
-  $('gpg').textContent = s > 0 ? money(m.gpg) : '—';
-  $('scrap').textContent = m.ok ? `${money(m.melt*CONFIG.scrap[0],0)} – ${money(m.melt*CONFIG.scrap[1],0)}` : '—';
+  $('ppg').textContent = m.ok ? money(m.ppg, 2) : '—';
+  $('scrap').textContent = m.ok ? `${money(m.melt * CONFIG.scrap[0])}–${Math.round(m.melt * CONFIG.scrap[1]).toLocaleString('en-CA')}` : '—';
 
-  renderCompare();
-  renderWhatIf(m, name);
-  store.set('gvc2', {pieces, tax: $('tax').value, cur: cur()});
+  renderCompare(); renderWhatIf(m);
+  store.set('gvc3', {pieces, tax: $('tax').value, cur: cur()});
 }
 
 function renderCompare(){
   $('cmpBand').hidden = pieces.length < 2;
   if (pieces.length < 2) return;
-  const ms = pieces.map(metrics), valid = ms.filter(m => m.ok && m.mult >= 1);
-  const bestMult = valid.length > 1 ? Math.min(...valid.map(m => m.mult)) : null;
+  const ms = pieces.map(metrics), ok = ms.filter(m => m.ok && m.mult >= 1);
+  const best = ok.length > 1 ? Math.min(...ok.map(m => m.mult)) : null;
   const row = (h, f) => `<tr><td>${h}</td>${ms.map((m,i) => `<td>${m.ok ? f(m, pieces[i]) : '—'}</td>`).join('')}</tr>`;
-  $('cmp').innerHTML = `<thead><tr><th></th>${pieces.map((p,i) => `<th>${esc(label(p,i))}${bestMult && ms[i].mult === bestMult ? '<span class="badge">Closest to gold value</span>' : ''}</th>`).join('')}</tr></thead><tbody>`
+  $('cmp').innerHTML = `<thead><tr><th></th>${pieces.map((p,i) => `<th>${esc(label(p,i))}</th>`).join('')}</tr></thead><tbody>`
+    + row('Gold has to rise', m => `<span class="${m.mult === best ? 'best' : ''}">${m.mult.toFixed(2)}×</span>`)
+    + row('Break-even', m => money(m.be))
     + row('Price with tax', m => money(m.paid))
-    + row('Weight', m => m.g.toFixed(2) + ' g')
-    + row('Karat', (m,p) => p.k + 'k')
     + row('Gold value', m => money(m.melt))
-    + row('You pay per gram', m => money(m.ppg))
-    + row('Times gold value', m => `<span class="${m.mult === bestMult ? 'best' : ''}">${m.mult.toFixed(2)}×</span>`)
-    + row('Break-even gold price', m => money(m.be,0) + ' / oz')
+    + row('Per gram', m => money(m.ppg, 2))
+    + row('Weight · karat', (m,p) => `${m.g.toFixed(2)} g · ${p.k}k`)
     + '</tbody>';
 }
 
-function renderWhatIf(m, name){
-  const s = m.s;
-  if (!(s > 0)) return;
-  const lo = Math.floor(s * 0.5 / 100) * 100;
-  const hi = Math.ceil(Math.max(m.ok ? m.be * 1.15 : 0, s * 2) / 100) * 100;
+function renderWhatIf(m){
+  const s = m.s; if (!(s > 0)) return;
+  const lo = Math.floor(s * 0.5 / 100) * 100, hi = Math.ceil(Math.max(m.ok ? m.be * 1.15 : 0, s * 2) / 100) * 100;
   const r = $('wi');
-  r.min = lo; r.max = hi; r.step = Math.max(10, Math.round((hi - lo) / 400 / 10) * 10);
+  r.min = lo; r.max = hi; r.step = 10;
   if (wiPrice === null || wiPrice < lo || wiPrice > hi) wiPrice = s;
   r.value = wiPrice;
-  $('wiMin').textContent = money(lo, 0); $('wiMax').textContent = money(hi, 0);
-  $('wiName').textContent = name;
-  $('wiAt').textContent = money(+r.value, 0);
+  $('wiMin').textContent = money(lo); $('wiMax').textContent = money(hi);
+  $('wiAt').textContent = money(+r.value);
   if (!m.ok) { $('wiVal').textContent = '—'; $('wiPct').textContent = ''; return; }
-  const v = m.g * m.pur * (+r.value / OZ), pct = v / m.paid * 100;
-  $('wiVal').textContent = money(v, 0);
-  $('wiPct').innerHTML = pct >= 100 ? `<b class="best">${Math.round(pct)}% of what you paid</b>, so the gold alone would cover the price.`
-    : `That's <b>${Math.round(pct)}%</b> of the ${money(m.paid,0)} you'd pay. ${+r.value === Math.round(s) || Math.abs(+r.value - s) < +r.step ? '(Today\'s price.)' : `Gold would be ${+r.value > s ? 'up' : 'down'} ${Math.abs(Math.round((+r.value / s - 1) * 100))}% from today.`}`;
+  const v = m.g * m.pur * (+r.value / OZ), pct = Math.round(v / m.paid * 100);
+  $('wiVal').textContent = money(v);
+  $('wiPct').textContent = pct >= 100 ? `${pct}% of what you'd pay. The gold alone would cover the price.` : `${pct}% of the ${money(m.paid)} you'd pay.`;
 }
 
 /* events */
-$('tabs').addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b) return;
-  if (b.id === 'add') { pieces.push(newPiece(pieces.length)); active = pieces.length - 1; renderTabs(); fillForm(); calc(); $('name').focus(); return; }
-  active = +b.dataset.i; renderTabs(); fillForm(); calc();
-});
-$('karats').addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b) return;
-  pieces[active].k = +b.dataset.k; fillForm(); calc();
-});
+$('tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; active = +b.dataset.i; renderTabs(); fillForm(); calc(); });
+$('karats').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; pieces[active].k = +b.dataset.k; fillForm(); calc(); });
 for (const id of ['price','wt','name']) $(id).addEventListener('input', () => { pieces[active][id] = $(id).value; if (id === 'name') renderTabs(); calc(); });
 $('unit').addEventListener('change', () => { pieces[active].unit = $('unit').value; calc(); });
 $('tax').addEventListener('change', calc);
@@ -439,28 +379,27 @@ $('spotIn').addEventListener('input', () => { manual = true; wiPrice = null; cal
 $('useLive').addEventListener('click', () => { manual = false; wiPrice = null; load(); });
 $('cur').addEventListener('change', () => { manual = false; wiPrice = null; load(); });
 $('wi').addEventListener('input', () => { wiPrice = +$('wi').value; calc(); });
-$('remove').addEventListener('click', () => { if (pieces.length < 2) return; pieces.splice(active, 1); active = Math.max(0, active - 1); renderTabs(); fillForm(); calc(); });
-$('reset').addEventListener('click', () => { pieces = [newPiece(0)]; active = 0; $('tax').value = CONFIG.defaultTax; renderTabs(); fillForm(); calc(); $('price').focus(); });
+$('add').addEventListener('click', () => {
+  if (pieces.length >= 3) return;
+  if (pieces.length === 1 && !pieces[0].name) pieces[0].name = 'Piece 1';
+  pieces.push(blank()); active = pieces.length - 1; renderTabs(); fillForm(); calc();
+  window.scrollTo({top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); $('price').focus({preventScroll:true});
+});
+$('remove').addEventListener('click', () => { pieces.splice(active, 1); active = Math.max(0, active - 1); renderTabs(); fillForm(); calc(); });
+$('reset').addEventListener('click', () => { pieces = [blank()]; active = 0; renderTabs(); fillForm(); calc(); $('price').focus(); });
 $('f').addEventListener('submit', e => e.preventDefault());
 
-async function copyText(t, ok){
-  try { await navigator.clipboard.writeText(t); $('copied').textContent = ok; }
-  catch(e){ $('copied').textContent = 'Copying isn\'t allowed here.'; }
-}
-$('copy').addEventListener('click', () => {
-  const p = pieces[active], m = metrics(p);
-  if (!m.ok) { $('copied').textContent = 'Enter a price and weight first.'; return; }
-  copyText(`${label(p, active)}: ${p.k}k, ${m.g.toFixed(2)} g, ${money(m.paid)}${taxRate() ? ' with tax' : ''}\n`
-    + `Gold today: ${money(m.s,0)}/oz\nGold needed to break even: ${money(m.be,0)}/oz\nGold has to go up ${m.mult.toFixed(2)}× from here\n`
-    + `Gold value of the piece: ${money(m.melt)}`, 'Copied.');
-});
-$('share').addEventListener('click', () => {
+$('share').addEventListener('click', async () => {
   const data = {pieces: pieces.map(({name,price,wt,unit,k}) => ({name,price,wt,unit,k})), tax: $('tax').value};
-  copyText(location.origin + location.pathname + '?c=' + encodeURIComponent(JSON.stringify(data)), 'Link copied. Anyone who opens it sees these pieces at the live price.');
+  const url = location.origin + location.pathname + '?c=' + encodeURIComponent(JSON.stringify(data));
+  const m = metrics(pieces[active]);
+  const text = m.ok ? `Gold has to rise ${m.mult.toFixed(2)}× (to ${money(m.be)}/oz) before the gold in this piece is worth the price.` : 'Check how much of a gold price is actually gold.';
+  try { if (navigator.share) { await navigator.share({title: 'Gold Value Check', text, url}); return; } } catch(e){ if (e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(url); $('msg').textContent = 'Link copied.'; }
+  catch(e){ $('msg').textContent = 'Couldn\'t copy the link here.'; }
 });
 
 renderTabs(); fillForm();
-$('spotIn').value = '';
 load();
 setInterval(() => { if (!document.hidden && !manual) load(); }, 60000);
 }
